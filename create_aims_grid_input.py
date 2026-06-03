@@ -67,7 +67,7 @@ def get_age_adim(hist, kind):
     if kind == 'MS':
         age_adim = hist.get('center_h1')
     elif kind == 'RGB':
-        age_adim = np.log10(hist.get('center_Rho') / (hist.get('star_mass')*c.msun) / (4/3 * np.pi * c.rsun**3 * hist.get('photosphere_r')**3))
+        age_adim = np.log10(hist.get('center_Rho') / ((hist.get('star_mass')*c.msun) / (4/3 * np.pi * c.rsun**3 * hist.get('photosphere_r')**3)))
     elif kind == 'RC':
         age_adim = (hist.get('star_age') - hist.get('star_age')[0]) / (hist.get('star_age')[-1] - hist.get('star_age')[0])
     else:
