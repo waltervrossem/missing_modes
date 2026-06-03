@@ -178,8 +178,9 @@ if __name__ == "__main__":
 
     sort_cols = ['Age', 'FeH.i', 'Mass', 'Yi', 'aFe.i']
     sort_i = [columns.index(col) for col in sort_cols]
-    data = data[np.lexsort(data[:, sort_i].T)]
-
+    order = np.lexsort(data[:, sort_i].T)
+    data = data[order]
+    paths = paths[order]
     with open(f'{output_path}/{grid_name}', 'w') as handle:
         handle.write(f'{base_path}    {freq_suffix}\n')
         for i, path in enumerate(paths):
