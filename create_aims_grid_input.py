@@ -50,14 +50,28 @@ def get_hist_and_index(path, kind):
 
 def get_mask(hist, kind):
     center_h1 = hist.get('center_h1')
+    center_h2 = hist.get('center_h2')
+    center_he3 = hist.get('center_he3')
     center_he4 = hist.get('center_he4')
-    log_L_trialpha = hist.get('log_LHe')
+    ratio_3a = hist.get('tri_alfa') - np.log10(hist.get('photosphere_L')) #ratio of log 3  (in Lsun) over total L
+    ztrack = 1 - center_h1 - center_h2 - center_he4 - center_he3
     if kind == 'MS':
-        mask = (center_h1 >= 1.0e-6)
+        # from MARCO:
+        mask = (center_h1 >= 1.0e-10)
     elif kind == 'RGB':
-        mask = (center_h1 < 1.0e-12) & (center_he4 > 0.90) &  (log_L_trialpha < 0.2) & (hist.get('nu_max') > 2.5)
+        # from MARCO:
+        # Only keep models where star_ratio is increasing
+        star_ratio = np.log10(hist.get('center_Rho')*(4./3. * np.pi * c.rsun**3 * hist.get('photosphere_r')**3) / (hist.get('star_mass')*c.msun))
+        mask_monotonic = np.zeros(len(star_ratio), dtype=bool)
+        ratio_old = -np.inf
+        for i, sr in enumerate(star_ratio):
+            if sr > ratio_old:
+                mask_monotonic[i] = True
+                ratio_old = sr
+        mask = (center_h1 < 1.0e-10) & ( (ratio_3a < -1) | (center_he4 > 0.965*(1-ztrack)) ) & (hist.get('nu_max') > 2.5) & (mask_monotonic)
     elif kind == 'RC':
-        mask = (center_h1 < 1.0e-12) & (center_he4 > 1e-9) & (log_L_trialpha >= 0.2) & (hist.get('mass_conv_core') > 0) & (hist.get('nu_max') > 2.5)
+        # from MARCO:
+        mask = (center_h1 <= 0.) & (center_he4 <= 0.965*(1-ztrack)) & (ratio_3a >= -1) & (center_he4 >= 1e-9) & (hist.get('nu_max') > 2.5)
     else:
         raise NotImplemented
     return mask
