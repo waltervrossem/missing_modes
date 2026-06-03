@@ -90,7 +90,10 @@ def get_age_adim(hist, kind):
 
 
 def make_input_dat(hist, kind):
-    base_name = hist.fname.replace('.track', '')
+    base_name = os.path.basename(os.path.dirname(hist.path))
+    yafe_dir  = os.path.basename(os.path.dirname(os.path.dirname(hist.path)))
+    relative_base = f"{yafe_dir}/{base_name}"
+
     mass, ovh, aFe, FeH, DYDZ, Y0 = split_name(base_name)
     ones = np.ones_like(hist.get('star_mass'))
 
@@ -153,7 +156,7 @@ def make_input_dat(hist, kind):
     dat, cols = dat[::2], dat[1::2]
     dat = np.array(dat).T
 
-    paths = [f'{base_name}/{base_name}.n{pnum}' for pnum in hist.index[:,2]]
+    paths = [f'{relative_base}/{base_name}.n{pnum}' for pnum in hist.index[:,2]]
 
     return paths, dat, cols
 
